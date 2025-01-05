@@ -97,6 +97,7 @@ Function Wallpaper-Scheduler-Refresh-Wallpaper {
     $current_wallpaper_dir = Split-Path -Path $config.current_wallpaper_path
     
     if (($current_wallpaper_dir -eq $wallpaper_dir) -and -not $force_update) {
+        [WallpaperScheduler]::refresh_wallpaper()
         ECHO "Wallpaper directory is already correct. Aborting."
         return
     }
@@ -133,7 +134,7 @@ Function Wallpaper-Scheduler-Refresh-Wallpaper {
     } else {
         ECHO "No wallpaper found!"
         ECHO "Refreshing wallpaper: FAILED!"
-    }    
+    }
 }
 
 
@@ -187,6 +188,12 @@ class WallpaperScheduler {
 
     static set_wallpaper([String] $filename) {
         Set-ItemProperty -path 'HKCU:\Control Panel\Desktop\' -name wallpaper -value $filename
+        for ($i=0; $i -lt 5; $i++) {
+            rundll32.exe user32.dll, UpdatePerUserSystemParameters
+        }
+    }
+
+    static [Void] refresh_wallpaper() {
         for ($i=0; $i -lt 5; $i++) {
             rundll32.exe user32.dll, UpdatePerUserSystemParameters
         }
